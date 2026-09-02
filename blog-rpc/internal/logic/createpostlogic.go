@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"time"
 
 	"blog-rpc/internal/model"
 	"blog-rpc/internal/svc"
@@ -27,13 +26,10 @@ func NewCreatePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Create
 
 // CreatePost 创建文章，将文章数据写入 blog_db
 func (l *CreatePostLogic) CreatePost(in *blog.CreatePostRequest) (*blog.CreatePostResponse, error) {
-	now := time.Now()
-	id, err := l.svcCtx.PostModel.Insert(l.ctx, &model.Post{
-		UserId:    in.UserId,
-		Title:     in.Title,
-		Content:   in.Content,
-		CreatedAt: now,
-		UpdatedAt: now,
+	id, err := l.svcCtx.PostsModel.InsertReturningID(l.ctx, &model.Posts{
+		UserId:  in.UserId,
+		Title:   in.Title,
+		Content: in.Content,
 	})
 	if err != nil {
 		return nil, err

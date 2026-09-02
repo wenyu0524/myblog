@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"blog-rpc/internal/model"
 	"blog-rpc/internal/svc"
 	"blog-rpc/pb/blog"
 
@@ -24,16 +25,21 @@ func NewDeletePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 	}
 }
 
-// DeletePost 删除文章，通过 user_id 校验所有权，受影响行数为 0 表示无权操作
+// DeletePost 删除文章。先通过带缓存的 FindOne 校验文章归属，再由 Delete 失效缓存。
 func (l *DeletePostLogic) DeletePost(in *blog.DeletePostRequest) (*blog.DeletePostResponse, error) {
-	affected, err := l.svcCtx.PostModel.Delete(l.ctx, in.Id, in.UserId)
+	post, err := l.svcCtx.PostsModel.FindOne(l.ctx, in.Id)
 	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return nil, errors.New("post not found or you don't have permission to delete")
+		}
 		return nil, err
 	}
 
-	// 受影响行数为 0：文章不存在或当前用户非作者
-	if affected == 0 {
+	if post.UserId != in.UserId {
 		return nil, errors.New("post not found or you don't have permission to delete")
+	}
+	if err := l.svcCtx.PostsModel.Delete(l.ctx, in.Id); err != nil {
+		return nil, err
 	}
 
 	return &blog.DeletePostResponse{}, nil

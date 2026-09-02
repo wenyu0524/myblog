@@ -3,7 +3,6 @@ package logic
 import (
 	"context"
 	"errors"
-	"time"
 
 	"blog-rpc/internal/model"
 	"blog-rpc/internal/svc"
@@ -26,22 +25,23 @@ func NewUpdatePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 	}
 }
 
-// UpdatePost 更新文章，通过 user_id 校验所有权，受影响行数为 0 表示无权操作
+// UpdatePost 更新文章。先通过带缓存的 FindOne 校验文章归属，再由 Update 失效缓存。
 func (l *UpdatePostLogic) UpdatePost(in *blog.UpdatePostRequest) (*blog.UpdatePostResponse, error) {
-	affected, err := l.svcCtx.PostModel.Update(l.ctx, &model.Post{
-		Id:        in.Id,
-		UserId:    in.UserId,
-		Title:     in.Title,
-		Content:   in.Content,
-		UpdatedAt: time.Now(),
-	})
+	post, err := l.svcCtx.PostsModel.FindOne(l.ctx, in.Id)
 	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return nil, errors.New("post not found or you don't have permission to update")
+		}
 		return nil, err
 	}
 
-	// 受影响行数为 0：文章不存在或当前用户非作者
-	if affected == 0 {
+	if post.UserId != in.UserId {
 		return nil, errors.New("post not found or you don't have permission to update")
+	}
+	post.Title = in.Title
+	post.Content = in.Content
+	if err := l.svcCtx.PostsModel.Update(l.ctx, post); err != nil {
+		return nil, err
 	}
 
 	return &blog.UpdatePostResponse{}, nil

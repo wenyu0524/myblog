@@ -26,18 +26,18 @@ func NewListPostsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListPos
 // ListPosts 分页查询文章列表，返回总数和当前页文章数据
 func (l *ListPostsLogic) ListPosts(in *blog.ListPostsRequest) (*blog.ListPostsResponse, error) {
 	// 查询文章总数，用于分页
-	total, err := l.svcCtx.PostModel.Count(l.ctx)
+	total, err := l.svcCtx.PostsModel.Count(l.ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// 分页查询当前页文章列表
-	posts, err := l.svcCtx.PostModel.List(l.ctx, in.Page, in.PageSize)
+	posts, err := l.svcCtx.PostsModel.List(l.ctx, in.Page, in.PageSize)
 	if err != nil {
 		return nil, err
 	}
 
-	// 将 model.Post 转换为 protobuf Post，时间戳转为 Unix 秒
+	// 将 model.Posts 转换为 protobuf Post，时间戳转为 Unix 秒
 	postList := make([]*blog.Post, 0, len(posts))
 	for _, p := range posts {
 		postList = append(postList, &blog.Post{
