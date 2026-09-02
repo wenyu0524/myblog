@@ -1,0 +1,22 @@
+# blog-api 配置文件（Docker 部署）
+# UserRpc 和 BlogRpc 通过 etcd 服务发现连接 RPC 服务
+
+Name: blog-api
+Host: 0.0.0.0
+Port: 8888
+
+Auth:
+  AccessSecret: "my-blog-secret-key-2026"
+  AccessExpire: 86400
+
+UserRpc:
+  Etcd:
+    Hosts:
+      - etcd:2379
+    Key: user.rpc
+
+BlogRpc:
+  Etcd:
+    Hosts:
+      - etcd:2379
+    Key: blog.rpc

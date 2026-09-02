@@ -1,0 +1,113 @@
+syntax = "v1"
+
+info (
+	title:   "Personal Blog API"
+	desc:    "Personal blog HTTP API"
+	version: "1.0"
+)
+
+type (
+	// =========================
+	// User 用户服务
+	// =========================
+	RegisterRequest {
+		Username string `json:"username"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
+	}
+	RegisterResponse {
+		UserId int64 `json:"userId"`
+	}
+	LoginRequest {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	LoginResponse {
+		Token string `json:"token"`
+	}
+	UserResponse {
+		Id       int64  `json:"id"`
+		Username string `json:"username"`
+		Email    string `json:"email"`
+	}
+	// =========================
+	// Blog 博客服务
+	// =========================
+	CreatePostRequest {
+		Title   string `json:"title"`
+		Content string `json:"content"`
+	}
+	CreatePostResponse {
+		Id int64 `json:"id"`
+	}
+	GetPostRequest {
+		Id int64 `json:"id"`
+	}
+	GetPostResponse {
+		Id        int64  `json:"id"`
+		UserId    int64  `json:"userId"`
+		Title     string `json:"title"`
+		Content   string `json:"content"`
+		CreatedAt int64  `json:"createdAt"`
+		UpdatedAt int64  `json:"updatedAt"`
+	}
+	ListPostsRequest {
+		Page     int `json:"page"`
+		PageSize int `json:"pageSize"`
+	}
+	ListPostsResponse {
+		Total int64      `json:"total"`
+		Posts []PostItem `json:"posts"`
+	}
+	PostItem {
+		Id        int64  `json:"id"`
+		UserId    int64  `json:"userId"`
+		Title     string `json:"title"`
+		CreatedAt int64  `json:"createdAt"`
+		UpdatedAt int64  `json:"updatedAt"`
+	}
+	UpdatePostRequest {
+		Id      int64  `json:"id"`
+		Title   string `json:"title"`
+		Content string `json:"content"`
+	}
+	UpdatePostResponse  {}
+	DeletePostRequest {
+		Id int64 `json:"id"`
+	}
+	DeletePostResponse  {}
+)
+
+// Public routes (no auth required)
+service blog-api {
+	@handler Register
+	post /api/users/register (RegisterRequest) returns (RegisterResponse)
+
+	@handler Login
+	post /api/users/login (LoginRequest) returns (LoginResponse)
+
+	@handler GetPost
+	post /api/posts/get (GetPostRequest) returns (GetPostResponse)
+
+	@handler ListPosts
+	post /api/posts/list (ListPostsRequest) returns (ListPostsResponse)
+}
+
+// Protected routes (JWT auth required)
+@server (
+	jwt: Auth
+)
+service blog-api {
+	@handler GetMe
+	post /api/users/me returns (UserResponse)
+
+	@handler CreatePost
+	post /api/posts/create (CreatePostRequest) returns (CreatePostResponse)
+
+	@handler UpdatePost
+	post /api/posts/update (UpdatePostRequest) returns (UpdatePostResponse)
+
+	@handler DeletePost
+	post /api/posts/delete (DeletePostRequest) returns (DeletePostResponse)
+}
+

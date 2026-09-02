@@ -1,0 +1,10 @@
+# user-rpc 配置文件（Docker 部署）
+# etcd 和 postgres 使用 docker-compose 中的服务名
+
+Name: user.rpc
+ListenOn: 0.0.0.0:8080
+Etcd:
+  Hosts:
+    - etcd:2379
+  Key: user.rpc
+DataSource: postgres://postgres:postgres@postgres:5432/user_db?sslmode=disable

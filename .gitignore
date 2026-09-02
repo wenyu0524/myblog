@@ -1,0 +1,126 @@
+```gitignore
+# ================================
+# Go
+# ================================
+
+# Go build output
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Coverage
+*.coverprofile
+coverage.out
+coverage.html
+
+# Go workspace
+go.work
+go.work.sum
+
+
+# ================================
+# Go-Zero / Project
+# ================================
+
+# Generated binaries
+bin/
+build/
+dist/
+
+# Temporary files
+tmp/
+temp/
+
+# Logs
+*.log
+logs/
+
+
+# ================================
+# Environment / Secrets
+# ================================
+
+.env
+.env.*
+!.env.example
+
+# Private keys / certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Local configuration
+config.local.yaml
+config.local.yml
+config.local.json
+
+
+# ================================
+# IDE
+# ================================
+
+# VS Code
+.vscode/
+
+# JetBrains / GoLand
+.idea/
+*.iml
+
+# Vim
+*.swp
+*.swo
+
+# Emacs
+*~
+
+
+# ================================
+# OS
+# ================================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+
+# ================================
+# Node.js (如果前端也在这个项目里)
+# ================================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Frontend build
+.next/
+.nuxt/
+.cache/
+
+
+# ================================
+# Docker
+# ================================
+
+# Local Docker environment
+docker-compose.override.yml
+
+
+# ================================
+# Test / Temporary
+# ================================
+
+*.tmp
+*.temp
+*.bak
+```

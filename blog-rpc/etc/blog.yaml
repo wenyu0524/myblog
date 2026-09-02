@@ -1,0 +1,14 @@
+# blog-rpc 配置文件（Docker 部署）
+# etcd 和 postgres 使用 docker-compose 中的服务名
+
+Name: blog.rpc
+ListenOn: 0.0.0.0:8081
+Etcd:
+  Hosts:
+    - etcd:2379
+  Key: blog.rpc
+DataSource: postgres://postgres:postgres@postgres:5432/blog_db?sslmode=disable
+
+CacheRedis:
+  - Host: redis:6379
+    Type: node

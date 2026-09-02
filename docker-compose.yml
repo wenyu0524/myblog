@@ -1,0 +1,134 @@
+# Docker Compose 编排文件 - myblog 博客项目
+# 包含 5 个服务：postgres、etcd、user-rpc、blog-rpc、blog-api
+#
+# 启动：docker compose up -d --build
+# 停止：docker compose down
+# 查看日志：docker compose logs -f blog-api
+# 重新构建：docker compose build
+
+services:
+  # =========================
+  # PostgreSQL 数据库
+  # 同时承载 user_db 和 blog_db 两个数据库
+  # 首次启动时自动执行 deploy/init-db.sql 建库建表
+  # =========================
+  postgres:
+    image: postgres:16-alpine
+    container_name: myblog-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./deploy/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      # pg_isready 检测数据库是否可连接
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  # =========================
+  # etcd 服务注册与发现
+  # user-rpc 和 blog-rpc 启动时向 etcd 注册，
+  # blog-api 通过 etcd 查找 RPC 服务地址
+  # =========================
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.21
+    container_name: myblog-etcd
+    environment:
+      # 开发环境关闭认证（生产环境请配置证书和密码）
+      ALLOW_NONE_AUTHENTICATION: "yes"
+      ETCD_ADVERTISE_CLIENT_URLS: "http://etcd:2379"
+      ETCD_LISTEN_CLIENT_URLS: "http://0.0.0.0:2379"
+    ports:
+      - "2379:2379"
+    volumes:
+      - etcd_data:/bitnami/etcd
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+
+  # =========================
+  # user-rpc 用户服务（gRPC :8080）
+  # 依赖 postgres（建库建表完成）和 etcd（可注册服务）
+  # =========================
+  user-rpc:
+    build:
+      context: .
+      dockerfile: user-rpc/Dockerfile
+    container_name: myblog-user-rpc
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      etcd:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # =========================
+  # blog-rpc 博客服务（gRPC :8081）
+  # 依赖 postgres 和 etcd
+  # =========================
+  blog-rpc:
+    build:
+      context: .
+      dockerfile: blog-rpc/Dockerfile
+    container_name: myblog-blog-rpc
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      etcd:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # =========================
+  # blog-api HTTP 网关（:8888）
+  # 通过 etcd 发现 user-rpc 和 blog-rpc，
+  # 对外提供 RESTful API，处理 JWT 认证
+  # =========================
+  blog-api:
+    build:
+      context: .
+      dockerfile: blog-api/Dockerfile
+    container_name: myblog-blog-api
+    ports:
+      - "8888:8888"
+    depends_on:
+      user-rpc:
+        condition: service_started
+      blog-rpc:
+        condition: service_started
+    restart: unless-stopped
+
+  # =========================
+  # Redis 缓存
+  # =========================
+  redis:
+    image: redis:7-alpine
+    container_name: myblog-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+# =========================
+# 数据持久化卷
+# =========================
+volumes:
+  postgres_data:
+  etcd_data:
+  redis_data:
