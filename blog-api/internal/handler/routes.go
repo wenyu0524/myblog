@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"blog-api/internal/middleware"
 	"net/http"
 
 	"blog-api/internal/svc"
@@ -14,24 +15,29 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				Method:  http.MethodPost,
-				Path:    "/api/users/register",
-				Handler: RegisterHandler(serverCtx),
+				Method: http.MethodPost,
+				Path:   "/api/users/register",
+				//Handler: RegisterHandler(serverCtx),
+				//限流路由
+				Handler: middleware.LimitByIP(serverCtx.RegisterLimiter)(RegisterHandler(serverCtx)),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/api/users/login",
-				Handler: LoginHandler(serverCtx),
+				Method: http.MethodPost,
+				Path:   "/api/users/login",
+				//Handler: LoginHandler(serverCtx),
+				Handler: middleware.LimitByIP(serverCtx.LoginLimiter)(LoginHandler(serverCtx)),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/api/posts/get",
-				Handler: GetPostHandler(serverCtx),
+				Method: http.MethodPost,
+				Path:   "/api/posts/get",
+				//Handler: GetPostHandler(serverCtx),
+				Handler: middleware.LimitByIP(serverCtx.GetPostLimiter)(GetPostHandler(serverCtx)),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/api/posts/list",
-				Handler: ListPostsHandler(serverCtx),
+				Method: http.MethodPost,
+				Path:   "/api/posts/list",
+				//Handler: ListPostsHandler(serverCtx),
+				Handler: middleware.LimitByIP(serverCtx.ListLimiter)(ListPostsHandler(serverCtx)),
 			},
 		},
 	)
@@ -45,9 +51,10 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: GetMeHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/api/posts/create",
-				Handler: CreatePostHandler(serverCtx),
+				Method: http.MethodPost,
+				Path:   "/api/posts/create",
+				//Handler: CreatePostHandler(serverCtx),
+				Handler: middleware.LimitByIP(serverCtx.WriteLimiter)(CreatePostHandler(serverCtx)),
 			},
 			{
 				Method:  http.MethodPost,

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/zrpc"
 )
@@ -14,4 +15,13 @@ type Config struct {
 	}
 	UserRpc zrpc.RpcClientConf // user-rpc gRPC 客户端配置（通过 etcd 服务发现）
 	BlogRpc zrpc.RpcClientConf // blog-rpc gRPC 客户端配置（通过 etcd 服务发现）
+
+	RateLimitRedis redis.RedisConf // 接口限流 Redis 配置
+	RateLimit      struct {
+		RegisterPerMinute  int
+		LoginPerMinute     int
+		GetPostPerMinute   int
+		ListPostsPerMinute int
+		WritePostPerMinute int
+	}
 }

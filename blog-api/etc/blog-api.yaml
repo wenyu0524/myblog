@@ -20,3 +20,15 @@ BlogRpc:
     Hosts:
       - etcd:2379
     Key: blog.rpc
+
+# 接口限流
+RateLimitRedis:
+  Host: redis:6379
+  Type: node
+
+RateLimit:
+  RegisterPerMinute: 5
+  LoginPerMinute: 10
+  GetPostPerMinute: 60
+  ListPostsPerMinute: 30
+  WritePostPerMinute: 20
