@@ -1,0 +1,332 @@
+syntax = "v1"
+
+info (
+	title:   "个人博客 API"
+	desc:    "个人博客 HTTP API"
+	version: "1.0.0"
+)
+
+type (
+	// 空响应，表示操作成功且不返回业务数据
+	EmptyResponse  {}
+	// 管理员登录请求，包含登录账号和密码
+	LoginRequest {
+		Username string `json:"username"` // 登录用户名
+		Password string `json:"password"` // 登录密码
+	}
+	// 管理员登录响应，返回访问令牌及其过期时间
+	LoginResponse {
+		Token     string `json:"token"` // 访问令牌
+		ExpiresAt int64  `json:"expiresAt"` // 令牌过期时间
+	}
+	// 博主公开资料，用于访客查看
+	ProfileResponse {
+		Id          int64  `json:"id"` // 资源 ID
+		Username    string `json:"username"` // 登录用户名
+		DisplayName string `json:"displayName"` // 显示名称
+		Avatar      string `json:"avatar"` // 头像地址
+		Bio         string `json:"bio"` // 个人简介
+		Email       string `json:"email"` // 邮箱地址
+		Website     string `json:"website"` // 个人网站地址
+		Github      string `json:"github"` // GitHub 主页地址
+	}
+	// 管理员完整资料，用于后台查看和编辑
+	UserResponse {
+		Id          int64  `json:"id"` // 资源 ID
+		Username    string `json:"username"` // 登录用户名
+		DisplayName string `json:"displayName"` // 显示名称
+		Avatar      string `json:"avatar"` // 头像地址
+		Bio         string `json:"bio"` // 个人简介
+		Email       string `json:"email"` // 邮箱地址
+		Website     string `json:"website"` // 个人网站地址
+		Github      string `json:"github"` // GitHub 主页地址
+	}
+	// 管理员资料更新请求
+	UpdateProfileRequest {
+		DisplayName string `json:"displayName"` // 显示名称
+		Avatar      string `json:"avatar"` // 头像地址
+		Bio         string `json:"bio"` // 个人简介
+		Email       string `json:"email"` // 邮箱地址
+		Website     string `json:"website"` // 个人网站地址
+		Github      string `json:"github"` // GitHub 主页地址
+	}
+	// 管理员密码更新请求，需同时提供旧密码和新密码
+	UpdatePasswordRequest {
+		OldPassword string `json:"oldPassword"` // 旧密码
+		NewPassword string `json:"newPassword"` // 新密码
+	}
+	// 文章列表查询请求，支持分页、分类和关键词筛选
+	ListPostsRequest {
+		Page     int64  `json:"page,default=1"` // 页码
+		PageSize int64  `json:"pageSize,default=10"` // 每页数量
+		Category string `json:"category,optional"` // 分类筛选条件
+		Keyword  string `json:"keyword,optional"` // 关键词筛选条件
+	}
+	// 访客可见的文章摘要
+	PublicPostItem {
+		Id           int64  `json:"id"` // 资源 ID
+		Title        string `json:"title"` // 文章标题
+		Slug         string `json:"slug"` // 文章别名
+		Summary      string `json:"summary"` // 文章摘要
+		Cover        string `json:"cover"` // 封面图片地址
+		CategoryId   int64  `json:"categoryId"` // 分类 ID
+		CategoryName string `json:"categoryName"` // 分类名称
+		PublishedAt  int64  `json:"publishedAt"` // 发布时间
+		CreatedAt    int64  `json:"createdAt"` // 创建时间
+		UpdatedAt    int64  `json:"updatedAt"` // 最后更新时间
+	}
+	// 管理员可见的文章摘要，包含状态和浏览量
+	AdminPostItem {
+		Id           int64  `json:"id"` // 资源 ID
+		Title        string `json:"title"` // 文章标题
+		Slug         string `json:"slug"` // 文章别名
+		Summary      string `json:"summary"` // 文章摘要
+		Cover        string `json:"cover"` // 封面图片地址
+		Status       string `json:"status"` // 文章状态
+		CategoryId   int64  `json:"categoryId"` // 分类 ID
+		CategoryName string `json:"categoryName"` // 分类名称
+		ViewCount    int64  `json:"viewCount"` // 浏览次数
+		PublishedAt  int64  `json:"publishedAt"` // 发布时间
+		CreatedAt    int64  `json:"createdAt"` // 创建时间
+		UpdatedAt    int64  `json:"updatedAt"` // 最后更新时间
+	}
+	// 访客文章列表响应
+	ListPublicPostsResponse {
+		Total int64            `json:"total"` // 数据总数
+		Posts []PublicPostItem `json:"posts"` // 文章列表
+	}
+	// 管理员文章列表响应
+	ListAdminPostsResponse {
+		Total int64           `json:"total"` // 数据总数
+		Posts []AdminPostItem `json:"posts"` // 文章列表
+	}
+	// 文章详情查询请求，文章 ID 从请求路径中读取
+	GetPostRequest {
+		Id int64 `path:"id"` // 资源 ID
+	}
+	// 访客可见的已发布文章详情
+	PublicPostResponse {
+		Id           int64  `json:"id"` // 资源 ID
+		Title        string `json:"title"` // 文章标题
+		Slug         string `json:"slug"` // 文章别名
+		Summary      string `json:"summary"` // 文章摘要
+		Content      string `json:"content"` // 文章正文
+		Cover        string `json:"cover"` // 封面图片地址
+		CategoryId   int64  `json:"categoryId"` // 分类 ID
+		CategoryName string `json:"categoryName"` // 分类名称
+		PublishedAt  int64  `json:"publishedAt"` // 发布时间
+		CreatedAt    int64  `json:"createdAt"` // 创建时间
+		UpdatedAt    int64  `json:"updatedAt"` // 最后更新时间
+	}
+	// 管理员可见的文章详情，包含状态和浏览量
+	AdminPostResponse {
+		Id           int64  `json:"id"` // 资源 ID
+		Title        string `json:"title"` // 文章标题
+		Slug         string `json:"slug"` // 文章别名
+		Summary      string `json:"summary"` // 文章摘要
+		Content      string `json:"content"` // 文章正文
+		Cover        string `json:"cover"` // 封面图片地址
+		Status       string `json:"status"` // 文章状态
+		CategoryId   int64  `json:"categoryId"` // 分类 ID
+		CategoryName string `json:"categoryName"` // 分类名称
+		ViewCount    int64  `json:"viewCount"` // 浏览次数
+		PublishedAt  int64  `json:"publishedAt"` // 发布时间
+		CreatedAt    int64  `json:"createdAt"` // 创建时间
+		UpdatedAt    int64  `json:"updatedAt"` // 最后更新时间
+	}
+	// 创建文章请求，可指定草稿或发布状态
+	CreatePostRequest {
+		Title       string `json:"title"` // 文章标题
+		Slug        string `json:"slug"` // 文章别名
+		Summary     string `json:"summary"` // 文章摘要
+		Content     string `json:"content"` // 文章正文
+		Cover       string `json:"cover"` // 封面图片地址
+		Status      string `json:"status"` // 文章状态
+		CategoryId  int64  `json:"categoryId"` // 分类 ID
+		PublishedAt int64  `json:"publishedAt,optional"` // 发布时间
+	}
+	// 创建文章响应，返回新文章 ID
+	CreatePostResponse {
+		Id int64 `json:"id"` // 资源 ID
+	}
+	// 更新文章请求，文章 ID 从请求路径中读取
+	UpdatePostRequest {
+		Id          int64  `path:"id"` // 资源 ID
+		Title       string `json:"title"` // 文章标题
+		Slug        string `json:"slug"` // 文章别名
+		Summary     string `json:"summary"` // 文章摘要
+		Content     string `json:"content"` // 文章正文
+		Cover       string `json:"cover"` // 封面图片地址
+		Status      string `json:"status"` // 文章状态
+		CategoryId  int64  `json:"categoryId"` // 分类 ID
+		PublishedAt int64  `json:"publishedAt,optional"` // 发布时间
+	}
+	// 删除文章请求，文章 ID 从请求路径中读取
+	DeletePostRequest {
+		Id int64 `path:"id"` // 资源 ID
+	}
+	// 文章分类信息
+	CategoryItem {
+		Id        int64  `json:"id"` // 资源 ID
+		Name      string `json:"name"` // 分类名称
+		Slug      string `json:"slug"` // 分类别名
+		Sort      int64  `json:"sort"` // 分类排序值
+		CreatedAt int64  `json:"createdAt"` // 创建时间
+		UpdatedAt int64  `json:"updatedAt"` // 最后更新时间
+	}
+	// 分类列表响应，用于展示和筛选文章
+	ListCategoriesResponse {
+		Categories []CategoryItem `json:"categories"` // 分类列表
+	}
+	// 创建文章分类请求
+	CreateCategoryRequest {
+		Name string `json:"name"` // 分类名称
+		Slug string `json:"slug"` // 分类别名
+		Sort int64  `json:"sort"` // 分类排序值
+	}
+	// 创建分类响应，返回新分类 ID
+	CreateCategoryResponse {
+		Id int64 `json:"id"` // 资源 ID
+	}
+	// 更新文章分类请求，分类 ID 从请求路径中读取
+	UpdateCategoryRequest {
+		Id   int64  `path:"id"` // 资源 ID
+		Name string `json:"name"` // 分类名称
+		Slug string `json:"slug"` // 分类别名
+		Sort int64  `json:"sort"` // 分类排序值
+	}
+	// 删除文章分类请求，分类 ID 从请求路径中读取
+	DeleteCategoryRequest {
+		Id int64 `path:"id"` // 资源 ID
+	}
+	// 图片上传请求，图片内容使用 Base64 编码传入
+	UploadImageRequest {
+		Filename    string `json:"filename"` // 图片文件名
+		ContentType string `json:"contentType"` // 图片 MIME 类型
+		Content     []byte `json:"content"` // 图片二进制内容
+	}
+	// 图片上传响应，返回图片访问地址
+	UploadImageResponse {
+		Url string `json:"url"` // 图片访问地址
+	}
+)
+
+// ========用户公共服务：游客可读取公开个人资料========
+@server (
+	prefix:     /api/v1
+	group:      user
+	middleware: UserRateLimitMiddleware
+)
+service myblog-api {
+	// 获取博客作者的公开资料
+	@handler GetProfile
+	post /profile returns (ProfileResponse)
+}
+
+// =======管理员登录服务：使用独立限流策略，防止暴力破解=======
+@server (
+	prefix:     /api/v1
+	group:      userAuth
+	middleware: LoginRateLimitMiddleware
+)
+service myblog-api {
+	// 校验管理员账号密码并签发 JWT
+	@handler Login
+	post /auth/login (LoginRequest) returns (LoginResponse)
+}
+
+// =======用户管理员服务：所有接口都要求 JWT，并在业务层再次校验用户身份=======
+@server (
+	prefix:     /api/v1
+	group:      userAdmin
+	jwt:        Auth
+	middleware: UserRateLimitMiddleware
+)
+service myblog-api {
+	// 获取当前登录管理员的完整资料
+	@handler GetMe
+	post /admin/profile returns (UserResponse)
+
+	// 更新管理员昵称、头像、简介、邮箱和外部链接
+	@handler UpdateProfile
+	post /admin/profile/update (UpdateProfileRequest) returns (EmptyResponse)
+
+	// 校验旧密码后修改管理员密码
+	@handler UpdatePassword
+	post /admin/password/update (UpdatePasswordRequest) returns (EmptyResponse)
+}
+
+// =======博客公共服务：仅返回已发布内容，游客不可见浏览量=======
+@server (
+	prefix:     /api/v1
+	group:      blogPublic
+	middleware: BlogRateLimitMiddleware
+)
+service myblog-api {
+	// 分页获取已发布文章，可按分类和关键词筛选
+	@handler ListPosts
+	post /posts (ListPostsRequest) returns (ListPublicPostsResponse)
+
+	// 获取已发布文章正文，并由服务端累加浏览量
+	@handler GetPost
+	post /posts/:id (GetPostRequest) returns (PublicPostResponse)
+
+	// 获取游客可用的文章分类列表，用于前端显示成分类菜单
+	@handler ListCategories
+	post /categories returns (ListCategoriesResponse)
+}
+
+// =======博客管理员服务：要求 JWT，可管理文章、分类并查看浏览量=======
+@server (
+	prefix:     /api/v1
+	group:      blogAdmin
+	jwt:        Auth
+	middleware: BlogRateLimitMiddleware
+)
+service myblog-api {
+	// 分页查看全部文章，包含草稿状态和浏览量
+	@handler ListPosts
+	post /admin/posts/list (ListPostsRequest) returns (ListAdminPostsResponse)
+
+	// 查看文章完整内容、发布状态和浏览量
+	@handler GetPost
+	post /admin/posts/:id (GetPostRequest) returns (AdminPostResponse)
+
+	// 创建文章，可保存为草稿或直接发布并绑定分类
+	@handler CreatePost
+	post /admin/posts (CreatePostRequest) returns (CreatePostResponse)
+
+	// 修改文章正文、分类、封面和发布状态
+	@handler UpdatePost
+	post /admin/posts/:id/update (UpdatePostRequest) returns (EmptyResponse)
+
+	// 软删除文章，避免误删造成数据不可恢复
+	@handler DeletePost
+	post /admin/posts/:id/delete (DeletePostRequest) returns (EmptyResponse)
+
+	// 创建文章分类
+	@handler CreateCategory
+	post /admin/categories (CreateCategoryRequest) returns (CreateCategoryResponse)
+
+	// 修改分类名称、别名和排序
+	@handler UpdateCategory
+	post /admin/categories/:id/update (UpdateCategoryRequest) returns (EmptyResponse)
+
+	// 删除分类；仍被文章引用时由服务端拒绝或要求先迁移
+	@handler DeleteCategory
+	post /admin/categories/:id/delete (DeleteCategoryRequest) returns (EmptyResponse)
+}
+
+// =======博客管理员服务中的图片上传能力：用于编辑文章时插入图片=======
+@server (
+	prefix:     /api/v1
+	group:      blogAdmin
+	jwt:        Auth
+	middleware: UploadRateLimitMiddleware
+)
+service myblog-api {
+	// 上传图片；服务端需校验格式、大小和实际内容
+	@handler UploadImage
+	post /admin/images (UploadImageRequest) returns (UploadImageResponse)
+}
+

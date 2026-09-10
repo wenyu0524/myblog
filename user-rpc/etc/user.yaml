@@ -1,0 +1,21 @@
+Name: user.rpc
+ListenOn: 0.0.0.0:8080
+
+# ── 服务发现 ──────────────────────────────────────────────────────────
+Etcd:
+  Hosts:
+  - etcd:2379
+  Key: user.rpc
+
+# ── 数据源 ─────────────────────────────────────────────────────────────
+DB:
+  DataSource: "postgres://postgres:postgres@postgres:5432/user_db?sslmode=disable"
+  DriverName: pgx
+  Weight: 100
+
+Cache:
+  - Host: redis:6379
+    Type: node
+
+# ── 作者 ID ────────────────────────────────────────────────────────────
+OwnerUserID: 1
