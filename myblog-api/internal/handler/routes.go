@@ -28,12 +28,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
-					Path:    "/admin/categories/:id/delete",
+					Path:    "/admin/categories/delete",
 					Handler: blogAdmin.DeleteCategoryHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
-					Path:    "/admin/categories/:id/update",
+					Path:    "/admin/categories/update",
 					Handler: blogAdmin.UpdateCategoryHandler(serverCtx),
 				},
 				{
@@ -43,23 +43,23 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
-					Path:    "/admin/posts/:id",
-					Handler: blogAdmin.GetPostHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/admin/posts/:id/delete",
+					Path:    "/admin/posts/delete",
 					Handler: blogAdmin.DeletePostHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
-					Path:    "/admin/posts/:id/update",
-					Handler: blogAdmin.UpdatePostHandler(serverCtx),
+					Path:    "/admin/posts/detail",
+					Handler: blogAdmin.GetPostHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/admin/posts/list",
 					Handler: blogAdmin.ListPostsHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/admin/posts/update",
+					Handler: blogAdmin.UpdatePostHandler(serverCtx),
 				},
 			}...,
 		),
@@ -98,7 +98,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
-					Path:    "/posts/:id",
+					Path:    "/posts/detail",
 					Handler: blogPublic.GetPostHandler(serverCtx),
 				},
 			}...,

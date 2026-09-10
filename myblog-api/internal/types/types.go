@@ -69,18 +69,18 @@ type CreatePostResponse struct {
 }
 
 type DeleteCategoryRequest struct {
-	Id int64 `path:"id"` // 资源 ID
+	Id int64 `json:"id"` // 资源 ID
 }
 
 type DeletePostRequest struct {
-	Id int64 `path:"id"` // 资源 ID
+	Id int64 `json:"id"` // 资源 ID
 }
 
 type EmptyResponse struct {
 }
 
 type GetPostRequest struct {
-	Id int64 `path:"id"` // 资源 ID
+	Id int64 `json:"id"` // 资源 ID
 }
 
 type ListAdminPostsResponse struct {
@@ -153,7 +153,7 @@ type PublicPostResponse struct {
 }
 
 type UpdateCategoryRequest struct {
-	Id   int64  `path:"id"`   // 资源 ID
+	Id   int64  `json:"id"`   // 资源 ID
 	Name string `json:"name"` // 分类名称
 	Slug string `json:"slug"` // 分类别名
 	Sort int64  `json:"sort"` // 分类排序值
@@ -165,7 +165,7 @@ type UpdatePasswordRequest struct {
 }
 
 type UpdatePostRequest struct {
-	Id          int64  `path:"id"`                   // 资源 ID
+	Id          int64  `json:"id"`                   // 资源 ID
 	Title       string `json:"title"`                // 文章标题
 	Slug        string `json:"slug"`                 // 文章别名
 	Summary     string `json:"summary"`              // 文章摘要

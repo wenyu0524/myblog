@@ -100,9 +100,9 @@ type (
 		Total int64           `json:"total"` // 数据总数
 		Posts []AdminPostItem `json:"posts"` // 文章列表
 	}
-	// 文章详情查询请求，文章 ID 从请求路径中读取
+	// 文章详情查询请求
 	GetPostRequest {
-		Id int64 `path:"id"` // 资源 ID
+		Id int64 `json:"id"` // 资源 ID
 	}
 	// 访客可见的已发布文章详情
 	PublicPostResponse {
@@ -149,9 +149,9 @@ type (
 	CreatePostResponse {
 		Id int64 `json:"id"` // 资源 ID
 	}
-	// 更新文章请求，文章 ID 从请求路径中读取
+	// 更新文章请求
 	UpdatePostRequest {
-		Id          int64  `path:"id"` // 资源 ID
+		Id          int64  `json:"id"` // 资源 ID
 		Title       string `json:"title"` // 文章标题
 		Slug        string `json:"slug"` // 文章别名
 		Summary     string `json:"summary"` // 文章摘要
@@ -161,9 +161,9 @@ type (
 		CategoryId  int64  `json:"categoryId"` // 分类 ID
 		PublishedAt int64  `json:"publishedAt,optional"` // 发布时间
 	}
-	// 删除文章请求，文章 ID 从请求路径中读取
+	// 删除文章请求
 	DeletePostRequest {
-		Id int64 `path:"id"` // 资源 ID
+		Id int64 `json:"id"` // 资源 ID
 	}
 	// 文章分类信息
 	CategoryItem {
@@ -188,16 +188,16 @@ type (
 	CreateCategoryResponse {
 		Id int64 `json:"id"` // 资源 ID
 	}
-	// 更新文章分类请求，分类 ID 从请求路径中读取
+	// 更新文章分类请求
 	UpdateCategoryRequest {
-		Id   int64  `path:"id"` // 资源 ID
+		Id   int64  `json:"id"` // 资源 ID
 		Name string `json:"name"` // 分类名称
 		Slug string `json:"slug"` // 分类别名
 		Sort int64  `json:"sort"` // 分类排序值
 	}
-	// 删除文章分类请求，分类 ID 从请求路径中读取
+	// 删除文章分类请求
 	DeleteCategoryRequest {
-		Id int64 `path:"id"` // 资源 ID
+		Id int64 `json:"id"` // 资源 ID
 	}
 	// 图片上传请求，图片内容使用 Base64 编码传入
 	UploadImageRequest {
@@ -269,7 +269,7 @@ service myblog-api {
 
 	// 获取已发布文章正文，并由服务端累加浏览量
 	@handler GetPost
-	post /posts/:id (GetPostRequest) returns (PublicPostResponse)
+	post /posts/detail (GetPostRequest) returns (PublicPostResponse)
 
 	// 获取游客可用的文章分类列表，用于前端显示成分类菜单
 	@handler ListCategories
@@ -290,7 +290,7 @@ service myblog-api {
 
 	// 查看文章完整内容、发布状态和浏览量
 	@handler GetPost
-	post /admin/posts/:id (GetPostRequest) returns (AdminPostResponse)
+	post /admin/posts/detail (GetPostRequest) returns (AdminPostResponse)
 
 	// 创建文章，可保存为草稿或直接发布并绑定分类
 	@handler CreatePost
@@ -298,11 +298,11 @@ service myblog-api {
 
 	// 修改文章正文、分类、封面和发布状态
 	@handler UpdatePost
-	post /admin/posts/:id/update (UpdatePostRequest) returns (EmptyResponse)
+	post /admin/posts/update (UpdatePostRequest) returns (EmptyResponse)
 
 	// 软删除文章，避免误删造成数据不可恢复
 	@handler DeletePost
-	post /admin/posts/:id/delete (DeletePostRequest) returns (EmptyResponse)
+	post /admin/posts/delete (DeletePostRequest) returns (EmptyResponse)
 
 	// 创建文章分类
 	@handler CreateCategory
@@ -310,11 +310,11 @@ service myblog-api {
 
 	// 修改分类名称、别名和排序
 	@handler UpdateCategory
-	post /admin/categories/:id/update (UpdateCategoryRequest) returns (EmptyResponse)
+	post /admin/categories/update (UpdateCategoryRequest) returns (EmptyResponse)
 
 	// 删除分类；仍被文章引用时由服务端拒绝或要求先迁移
 	@handler DeleteCategory
-	post /admin/categories/:id/delete (DeleteCategoryRequest) returns (EmptyResponse)
+	post /admin/categories/delete (DeleteCategoryRequest) returns (EmptyResponse)
 }
 
 // =======博客管理员服务中的图片上传能力：用于编辑文章时插入图片=======
