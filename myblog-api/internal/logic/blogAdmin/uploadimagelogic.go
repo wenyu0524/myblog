@@ -4,7 +4,10 @@
 package blogAdmin
 
 import (
+	"blog-rpc/blogclient"
 	"context"
+	"errors"
+	userAdmin "myblog-api/internal/logic/userAdmin"
 
 	"myblog-api/internal/svc"
 	"myblog-api/internal/types"
@@ -27,7 +30,16 @@ func NewUploadImageLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Uploa
 }
 
 func (l *UploadImageLogic) UploadImage(req *types.UploadImageRequest) (resp *types.UploadImageResponse, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	if req == nil {
+		return nil, errors.New("请求不能为空")
+	}
+	id, err := userAdmin.UserIdFromCtx(l.ctx)
+	if err != nil {
+		return nil, err
+	}
+	r, err := l.svcCtx.BlogRpc.UploadImage(l.ctx, &blogclient.UploadImageRequest{UserId: id, Filename: req.Filename, ContentType: req.ContentType, Content: req.Content})
+	if err != nil {
+		return nil, err
+	}
+	return &types.UploadImageResponse{Url: r.Url}, nil
 }

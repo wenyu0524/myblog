@@ -6,7 +6,7 @@ import (
 	"errors"
 )
 
-func userIdFromCtx(ctx context.Context) (int64, error) {
+func UserIdFromCtx(ctx context.Context) (int64, error) {
 	switch v := ctx.Value("userId").(type) {
 	case json.Number:
 		return v.Int64()

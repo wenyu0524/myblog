@@ -4,7 +4,10 @@
 package blogAdmin
 
 import (
+	"blog-rpc/blogclient"
 	"context"
+	"errors"
+	userAdmin "myblog-api/internal/logic/userAdmin"
 
 	"myblog-api/internal/svc"
 	"myblog-api/internal/types"
@@ -27,7 +30,16 @@ func NewUpdateCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Up
 }
 
 func (l *UpdateCategoryLogic) UpdateCategory(req *types.UpdateCategoryRequest) (resp *types.EmptyResponse, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	if req == nil {
+		return nil, errors.New("请求不能为空")
+	}
+	id, err := userAdmin.UserIdFromCtx(l.ctx)
+	if err != nil {
+		return nil, err
+	}
+	_, err = l.svcCtx.BlogRpc.UpdateCategory(l.ctx, &blogclient.UpdateCategoryRequest{UserId: id, Id: req.Id, Name: req.Name, Slug: req.Slug, Sort: req.Sort})
+	if err != nil {
+		return nil, err
+	}
+	return &types.EmptyResponse{}, nil
 }

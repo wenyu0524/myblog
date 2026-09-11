@@ -32,7 +32,7 @@ func (l *UpdatePasswordLogic) UpdatePassword(req *types.UpdatePasswordRequest) (
 	if req == nil {
 		return nil, errors.New("请求不能为空")
 	}
-	userId, err := userIdFromCtx(l.ctx)
+	userId, err := UserIdFromCtx(l.ctx)
 	if err != nil {
 		return nil, err
 	}

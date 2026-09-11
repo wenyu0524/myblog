@@ -8,6 +8,11 @@ import (
 
 type Config struct {
 	zrpc.RpcServerConf
-	DB    sqlx.SqlConf
-	Cache cache.CacheConf
+	DB     sqlx.SqlConf
+	Cache  cache.CacheConf
+	Upload struct {
+		Dir      string
+		BaseUrl  string
+		MaxBytes int64
+	}
 }

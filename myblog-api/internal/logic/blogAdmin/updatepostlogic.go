@@ -4,7 +4,10 @@
 package blogAdmin
 
 import (
+	"blog-rpc/blogclient"
 	"context"
+	"errors"
+	userAdmin "myblog-api/internal/logic/userAdmin"
 
 	"myblog-api/internal/svc"
 	"myblog-api/internal/types"
@@ -27,7 +30,16 @@ func NewUpdatePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 }
 
 func (l *UpdatePostLogic) UpdatePost(req *types.UpdatePostRequest) (resp *types.EmptyResponse, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	if req == nil {
+		return nil, errors.New("请求不能为空")
+	}
+	id, err := userAdmin.UserIdFromCtx(l.ctx)
+	if err != nil {
+		return nil, err
+	}
+	_, err = l.svcCtx.BlogRpc.UpdatePost(l.ctx, &blogclient.UpdatePostRequest{UserId: id, Id: req.Id, Title: req.Title, Slug: req.Slug, Summary: req.Summary, Content: req.Content, Cover: req.Cover, Status: req.Status, CategoryId: req.CategoryId, PublishedAt: req.PublishedAt})
+	if err != nil {
+		return nil, err
+	}
+	return &types.EmptyResponse{}, nil
 }

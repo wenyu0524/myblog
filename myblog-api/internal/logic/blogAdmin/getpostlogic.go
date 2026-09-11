@@ -4,7 +4,9 @@
 package blogAdmin
 
 import (
+	"blog-rpc/blogclient"
 	"context"
+	"errors"
 
 	"myblog-api/internal/svc"
 	"myblog-api/internal/types"
@@ -27,7 +29,12 @@ func NewGetPostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetPostLo
 }
 
 func (l *GetPostLogic) GetPost(req *types.GetPostRequest) (resp *types.AdminPostResponse, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	if req == nil {
+		return nil, errors.New("请求不能为空")
+	}
+	r, err := l.svcCtx.BlogRpc.GetAdminPost(l.ctx, &blogclient.GetPostRequest{Id: req.Id})
+	if err != nil {
+		return nil, err
+	}
+	return &types.AdminPostResponse{Id: r.Id, Title: r.Title, Slug: r.Slug, Summary: r.Summary, Content: r.Content, Cover: r.Cover, Status: r.Status, CategoryId: r.CategoryId, CategoryName: r.CategoryName, ViewCount: r.ViewCount, PublishedAt: r.PublishedAt, CreatedAt: r.CreatedAt, UpdatedAt: r.UpdatedAt}, nil
 }

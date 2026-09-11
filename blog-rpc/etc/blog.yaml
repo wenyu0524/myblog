@@ -16,3 +16,8 @@ DB:
 Cache:
   - Host: redis:6379
     Type: node
+
+Upload:
+  Dir: "./uploads"
+  BaseUrl: "/uploads"
+  MaxBytes: 5242880

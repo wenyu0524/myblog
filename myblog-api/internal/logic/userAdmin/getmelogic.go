@@ -28,7 +28,7 @@ func NewGetMeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetMeLogic 
 }
 
 func (l *GetMeLogic) GetMe() (resp *types.UserResponse, err error) {
-	userId, err := userIdFromCtx(l.ctx)
+	userId, err := UserIdFromCtx(l.ctx)
 	if err != nil {
 		return nil, err
 	}

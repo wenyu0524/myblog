@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"blog-rpc/internal/model"
 	"blog-rpc/internal/svc"
 	"blog-rpc/pb/blog"
 	"context"
@@ -25,5 +26,12 @@ func NewCreateCategoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Cr
 }
 
 func (l *CreateCategoryLogic) CreateCategory(in *blog.CreateCategoryRequest) (*blog.CreateCategoryResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "CreateCategory 方法尚未实现")
+	if in == nil || in.UserId <= 0 || in.Name == "" || in.Slug == "" {
+		return nil, status.Error(codes.InvalidArgument, "用户、分类名称和别名不能为空")
+	}
+	id, err := l.svcCtx.CategoriesModel.Create(l.ctx, &model.Categories{Name: in.Name, Slug: in.Slug, Sort: in.Sort})
+	if err != nil {
+		return nil, status.Error(codes.Internal, "分类创建失败，请稍后重试")
+	}
+	return &blog.CreateCategoryResponse{Id: id}, nil
 }

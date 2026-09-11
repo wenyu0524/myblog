@@ -32,7 +32,7 @@ func (l *UpdateProfileLogic) UpdateProfile(req *types.UpdateProfileRequest) (res
 	if req == nil {
 		return nil, errors.New("请求不能为空")
 	}
-	userId, err := userIdFromCtx(l.ctx)
+	userId, err := UserIdFromCtx(l.ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@
 package blogAdmin
 
 import (
+	"blog-rpc/blogclient"
 	"context"
 
 	"myblog-api/internal/svc"
@@ -27,7 +28,16 @@ func NewListPostsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ListPos
 }
 
 func (l *ListPostsLogic) ListPosts(req *types.ListPostsRequest) (resp *types.ListAdminPostsResponse, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	if req == nil {
+		req = &types.ListPostsRequest{}
+	}
+	r, err := l.svcCtx.BlogRpc.ListAdminPosts(l.ctx, &blogclient.ListPostsRequest{Page: req.Page, PageSize: req.PageSize, Category: req.Category, Keyword: req.Keyword})
+	if err != nil {
+		return nil, err
+	}
+	resp = &types.ListAdminPostsResponse{Total: r.Total, Posts: make([]types.AdminPostItem, 0, len(r.Posts))}
+	for _, p := range r.Posts {
+		resp.Posts = append(resp.Posts, types.AdminPostItem{Id: p.Id, Title: p.Title, Slug: p.Slug, Summary: p.Summary, Cover: p.Cover, Status: p.Status, CategoryId: p.CategoryId, CategoryName: p.CategoryName, ViewCount: p.ViewCount, PublishedAt: p.PublishedAt, CreatedAt: p.CreatedAt, UpdatedAt: p.UpdatedAt})
+	}
+	return resp, nil
 }
