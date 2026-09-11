@@ -6,17 +6,23 @@ package middleware
 import "net/http"
 
 type UploadRateLimitMiddleware struct {
+	store *limiterStore
 }
 
-func NewUploadRateLimitMiddleware() *UploadRateLimitMiddleware {
-	return &UploadRateLimitMiddleware{}
+func NewUploadRateLimitMiddleware(perMinute int) *UploadRateLimitMiddleware {
+	return &UploadRateLimitMiddleware{store: newLimiterStore(perMinute)}
 }
 
 func (m *UploadRateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// TODO generate middleware implement function, delete after code implementation
-
-		// Passthrough to next handler if need
+		key := clientIP(r)
+		if userID := r.Context().Value("userId"); userID != nil {
+			key += ":" + toString(userID)
+		}
+		if !m.store.allow(key) {
+			reject(w)
+			return
+		}
 		next(w, r)
 	}
 }

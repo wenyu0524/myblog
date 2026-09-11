@@ -12,6 +12,8 @@ CpuThreshold: 900             # CPU % * 10，用于负载卸除（默认：900 =
 RateLimit:
   UserPerMinute: 60           # 公开资料和管理员用户接口
   LoginPerMinute: 5           # 登录接口，按 IP + 用户名
+  BlogPerMinute: 60           # 博客读写接口，按 IP；管理接口额外按用户
+  UploadPerMinute: 20         # 图片上传接口，按 IP + 用户
 
 # ── 认证 ──────────────────────────────────────────────────────────────────
 Auth:

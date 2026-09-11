@@ -6,17 +6,23 @@ package middleware
 import "net/http"
 
 type BlogRateLimitMiddleware struct {
+	store *limiterStore
 }
 
-func NewBlogRateLimitMiddleware() *BlogRateLimitMiddleware {
-	return &BlogRateLimitMiddleware{}
+func NewBlogRateLimitMiddleware(perMinute int) *BlogRateLimitMiddleware {
+	return &BlogRateLimitMiddleware{store: newLimiterStore(perMinute)}
 }
 
 func (m *BlogRateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// TODO generate middleware implement function, delete after code implementation
-
-		// Passthrough to next handler if need
+		key := clientIP(r)
+		if userID := r.Context().Value("userId"); userID != nil {
+			key += ":" + toString(userID)
+		}
+		if !m.store.allow(key) {
+			reject(w)
+			return
+		}
 		next(w, r)
 	}
 }

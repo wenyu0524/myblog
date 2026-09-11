@@ -19,8 +19,10 @@ type Config struct {
 
 	// 限流配置
 	RateLimit struct {
-		UserPerMinute  int
-		LoginPerMinute int
+		UserPerMinute   int
+		LoginPerMinute  int
+		BlogPerMinute   int
+		UploadPerMinute int
 	}
 
 	// JWT 配置

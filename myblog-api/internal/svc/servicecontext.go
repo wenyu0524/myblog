@@ -29,8 +29,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config: c,
 
-		BlogRateLimitMiddleware:   middleware.NewBlogRateLimitMiddleware().Handle,
-		UploadRateLimitMiddleware: middleware.NewUploadRateLimitMiddleware().Handle,
+		BlogRateLimitMiddleware:   middleware.NewBlogRateLimitMiddleware(c.RateLimit.BlogPerMinute).Handle,
+		UploadRateLimitMiddleware: middleware.NewUploadRateLimitMiddleware(c.RateLimit.UploadPerMinute).Handle,
 		UserRateLimitMiddleware:   middleware.NewUserRateLimitMiddleware(c.RateLimit.UserPerMinute).Handle,
 		LoginRateLimitMiddleware:  middleware.NewLoginRateLimitMiddleware(c.RateLimit.LoginPerMinute).Handle,
 
