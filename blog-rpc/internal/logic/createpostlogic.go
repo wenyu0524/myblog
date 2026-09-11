@@ -31,8 +31,8 @@ func NewCreatePostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Create
 }
 
 func (l *CreatePostLogic) CreatePost(in *blog.CreatePostRequest) (*blog.CreatePostResponse, error) {
-	if in == nil || in.UserId <= 0 || in.Title == "" || in.Slug == "" || in.Content == "" {
-		return nil, status.Error(codes.InvalidArgument, "用户、标题、别名和正文不能为空")
+	if in == nil || in.Title == "" {
+		return nil, status.Error(codes.InvalidArgument, "标题不能为空")
 	}
 	if in.Status != "draft" && in.Status != "published" {
 		return nil, status.Error(codes.InvalidArgument, "文章状态不正确")
