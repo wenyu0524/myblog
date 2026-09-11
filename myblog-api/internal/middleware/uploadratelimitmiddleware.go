@@ -3,7 +3,10 @@
 
 package middleware
 
-import "net/http"
+import (
+	"net/http"
+	"github.com/zeromicro/go-zero/core/logx"
+)
 
 type UploadRateLimitMiddleware struct {
 	store *limiterStore
@@ -20,6 +23,7 @@ func (m *UploadRateLimitMiddleware) Handle(next http.HandlerFunc) http.HandlerFu
 			key += ":" + toString(userID)
 		}
 		if !m.store.allow(key) {
+			logx.WithContext(r.Context()).WithFields(logx.Field("method", r.Method), logx.Field("path", r.URL.Path), logx.Field("client_ip", clientIP(r)), logx.Field("limit_per_minute", m.store.perMinute)).Error("request rate limit exceeded")
 			reject(w)
 			return
 		}
