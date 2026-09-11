@@ -26,12 +26,18 @@ type (
 		IncrementView(ctx context.Context, id int64) error
 	}
 	PublicPost struct {
-		Id, CategoryId, PublishedAt, CreatedAt, UpdatedAt  int64
-		Title, Slug, Summary, Content, Cover, CategoryName string
+		Id                                   int64
+		Title, Slug, Summary, Content, Cover string
+		CategoryId                           int64
+		CategoryName                         string
+		PublishedAt, CreatedAt, UpdatedAt    int64
 	}
 	AdminPost struct {
-		Id, CategoryId, ViewCount, PublishedAt, CreatedAt, UpdatedAt int64
-		Title, Slug, Summary, Content, Cover, Status, CategoryName   string
+		Id                                           int64
+		Title, Slug, Summary, Content, Cover, Status string
+		CategoryId                                   int64
+		CategoryName                                 string
+		ViewCount, PublishedAt, CreatedAt, UpdatedAt int64
 	}
 
 	customPostsModel struct {
